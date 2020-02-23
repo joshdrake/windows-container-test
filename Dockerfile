@@ -1,20 +1,26 @@
-FROM mcr.microsoft.com/windows/servercore:ltsc2019
+# escape=`
+FROM python:3.6-windowsservercore AS python
 
-RUN powershell.exe -Command Invoke-WebRequest https://www.python.org/ftp/python/3.7.6/python-3.7.6-amd64.exe -OutFile d:\a\1\s\python-3.7.6-amd64.exe
+FROM mcr.microsoft.com/windows/nanoserver:10.0.14393.2068
 
-RUN powershell.exe -Command \
-    $ErrorActionPreference = 'Stop'; \
-    Start-Process c:\python-3.7.6-amd64.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1 Include_pip=0' -Wait; \
-    Remove-Item c:\python-3.7.6-amd64.exe -Force
+COPY --from=python /Python /Python
 
-RUN powershell.exe -Command \
-    $ErrorActionPreference = 'Stop'; \
-    Invoke-WebRequest https://bootstrap.pypa.io/get-pip.py -OutFile c:\get-pip.py ; \
-    Start-Process python C:\get-pip.py pip==20.0.2 \
-    Remove-Item c:\get-pipe.py -Force
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-RUN powershell.exe -Command \
-    $ErrorActionPreference = 'Stop'; \
-    pip --version
+ENV PYTHON_VERSION 3.6.1
+ENV PYTHON_PIP_VERSION 9.0.1
+
+RUN $env:PATH = 'C:\Python;C:\Python\Scripts;{0}' -f $env:PATH ; `
+    Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment\' -Name Path -Value $env:PATH ; `
+    mkdir $env:APPDATA\Python\Python36\site-packages ; `
+    Invoke-WebRequest 'https://bootstrap.pypa.io/get-pip.py' -OutFile 'get-pip.py' -UseBasicParsing ; `
+    $replace = ('import tempfile{0}import site{0}site.getusersitepackages()' -f [char][int]10) ; `
+    Get-Content get-pip.py | Foreach-Object { $_ -replace 'import tempfile', $replace } | Out-File -Encoding Ascii getpip.py ; `
+    $pipInstall = ('pip=={0}' -f $env:PYTHON_PIP_VERSION) ; `
+    python getpip.py $pipInstall ; `
+    Remove-Item get-pip.py ; `
+    Remove-Item getpip.py
+
+RUN pip install --no-cache-dir virtualenv
 
 CMD [ "python.exe" ]
