@@ -8,12 +8,12 @@ RUN powershell.exe -Command \
 
 RUN powershell.exe -Command \
     $ErrorActionPreference = 'Stop'; \
-    Invoke-WebRequest https://bootstrap.pypa.io/get-pip.py -OutFile c:\get-pip.py ; 
+    Invoke-WebRequest https://bootstrap.pypa.io/get-pip.py -OutFile c:\get-pip.py ; \
     Start-Process python C:\get-pip.py pip==20.0.2 \
     Remove-Item c:\get-pipe.py -Force
 
 RUN powershell.exe -Command \
-    $ErrorActionPreference = 'Stop'; 
+    $ErrorActionPreference = 'Stop'; \
     pip --version
 
 CMD [ "python.exe" ]
