@@ -1,24 +1,19 @@
-# escape=`
-
 FROM mcr.microsoft.com/windows/servercore:ltsc2019
 
-ENV PYTHON_VERSION 3.7.6
-ENV PYTHON_RELEASE 3.7.6
-
-RUN powershell.exe -Command `
-    $ErrorActionPreference = 'Stop'; `
-    wget https://www.python.org/ftp/python/3.7.6/python-3.7.6-amd64.exe -OutFile c:\python-3.7.6-amd64.exe ; `
-    Start-Process c:\python-3.7.6-amd64.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1 Include_pip=0' -Wait ; `
+RUN powershell.exe -Command \
+    $ErrorActionPreference = 'Stop'; \
+    Invoke-WebRequest https://www.python.org/ftp/python/3.7.6/python-3.7.6-amd64.exe -OutFile c:\python-3.7.6-amd64.exe; \
+    Start-Process c:\python-3.7.6-amd64.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1 Include_pip=0' -Wait; \
     Remove-Item c:\python-3.7.6-amd64.exe -Force
 
-RUN powershell.exe -Command `
-    $ErrorActionPreference = 'Stop'; `
-    wget https://bootstrap.pypa.io/get-pip.py -OutFile c:\get-pip.py ; `
-    Start-Process python C:\get-pip.py pip==20.0.2 `
+RUN powershell.exe -Command \
+    $ErrorActionPreference = 'Stop'; \
+    Invoke-WebRequest https://bootstrap.pypa.io/get-pip.py -OutFile c:\get-pip.py ; 
+    Start-Process python C:\get-pip.py pip==20.0.2 \
     Remove-Item c:\get-pipe.py -Force
 
-RUN powershell.exe -Command `
-    $ErrorActionPreference = 'Stop'; `
-    pip --version;
+RUN powershell.exe -Command \
+    $ErrorActionPreference = 'Stop'; 
+    pip --version
 
 CMD [ "python.exe" ]
