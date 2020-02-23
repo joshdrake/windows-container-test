@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/windows/servercore:ltsc2019
 
-RUN powershell.exe -Command Invoke-WebRequest https://www.python.org/ftp/python/3.7.6/python-3.7.6-amd64.exe -OutFile c:\python-3.7.6-amd64.exe
+RUN powershell.exe -Command Invoke-WebRequest https://www.python.org/ftp/python/3.7.6/python-3.7.6-amd64.exe -OutFile d:\a\1\s\python-3.7.6-amd64.exe
 
 RUN powershell.exe -Command \
     $ErrorActionPreference = 'Stop'; \
